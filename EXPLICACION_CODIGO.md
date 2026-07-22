@@ -21,7 +21,7 @@ Sin importar cuál de los scripts ejecutes, la lógica sigue un orden secuencial
 ### Fase A: Preparación de Datos
 1.  **Extracción del Dataset:** El código busca un archivo `tumor.zip` en la carpeta. Si lo encuentra, lo descomprime automáticamente creando una carpeta llamada `dataset`. Si ya existe, se salta este paso para ahorrar tiempo.
 2.  **Definición de las Clases:** Le enseña a la IA que existen 4 categorías enumeradas: `0: Pituitary`, `1: Meningioma`, `2: Glioma` y `3: Notumor` (Cerebro sano). *El orden numérico es crítico para evitar confusiones.*
-3.  **División (Train / Validation):** De todas las fotos extraídas, separa aleatoriamente el **80%** para "Entrenamiento" (imágenes que la IA estudiará) y el **20%** para "Validación" (imágenes que se le ocultan a la IA para hacerle un examen sorpresa más adelante).
+3.  **Filtrado y División (Train / Validation):** El código utiliza el **100% de las imágenes válidas** del dataset. Al procesar las carpetas, hace una verificación de seguridad muy importante: si encuentra una foto (`.jpg`) que no tiene su archivo de texto correspondiente con las coordenadas (`.txt`), la ignora automáticamente para no arruinar el entrenamiento. Todo el resto de la data (el 100% válido) se divide aleatoriamente: el **80%** se guarda en `train` (imágenes que la IA estudiará) y el **20%** se guarda en `val` (imágenes que se le ocultan a la IA para hacerle un examen sorpresa más adelante).
 4.  **Generación del `data.yaml`:** YOLO necesita saber las rutas exactas de tu computadora (ej. `D:\Proyecto\dataset\...`). El script genera este archivo automáticamente para que YOLO no se pierda buscando las imágenes.
 
 ### Fase B: Entrenamiento del Modelo
@@ -38,3 +38,21 @@ Sin importar cuál de los scripts ejecutes, la lógica sigue un orden secuencial
     *   *Opción 1:* Saca una foto al azar de las de "Validación" y te muestra si la IA acierta.
     *   *Opción 2:* Abre la clásica ventanita de Windows (`tkinter`) para que explores tus carpetas, elijas un archivo `.jpg` y se lo envíes a la IA para analizarlo.
     *   *Opción 3:* Cierra el programa de forma limpia.
+
+---
+
+## 3. Datos Técnicos Adicionales (Importante para Reportes)
+
+Si necesitas documentar tu proyecto para la universidad o explicarlo en una presentación, ten en cuenta estos 3 detalles técnicos que ocurren "tras bambalinas" en el código:
+
+### 1. La Carpeta de Resultados (`runs/`)
+Cuando YOLO termina de entrenar, genera automáticamente una carpeta llamada `runs/detect/yolov11_btd/`.
+Esta carpeta es invaluable porque contiene **evidencia matemática** de que el modelo aprendió. Allí encontrarás imágenes de prueba y gráficas estadísticas de rendimiento (como la *Matriz de Confusión*, la curva *F1-Confidence*, y las gráficas de *Pérdida/Loss*). Estas gráficas son perfectas y necesarias para adjuntar en reportes académicos.
+
+### 2. El Archivo de Pesos Final (`best.pt`)
+Al inicio descargamos el modelo vacío `yolo11n.pt`, pero el objetivo real de todo este entrenamiento es generar un nuevo archivo llamado `best.pt` (el cual se guarda dentro de la carpeta `runs/detect/.../weights/`).
+Este archivo es tu **"Cerebro Congelado"**. Contiene todo el conocimiento médico que la IA adquirió tras estudiar las fotos durante las 50 épocas. Si en el futuro quieres crear una página web o una app móvil para detectar tumores, no necesitas volver a llevarte el código de entrenamiento ni la enorme carpeta de imágenes; solo necesitas llevarte ese pequeño archivo `best.pt`.
+
+### 3. El Umbral de Confianza (`conf_threshold = 0.3`)
+En la función que dibuja el recuadro verde de la predicción, existe un parámetro oculto llamado `conf_threshold=0.3`.
+Esto significa que has programado a la IA para ser cautelosa: si la red neuronal encuentra una "mancha" en el cerebro pero está **menos del 30% segura** de que es un tumor, simplemente no la marcará. Esto es crucial para evitar *Falsos Positivos* (decirle a una persona sana que tiene un tumor) por culpa de cualquier ruido o mancha normal en la radiografía.

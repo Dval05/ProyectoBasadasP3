@@ -72,6 +72,8 @@ Tienes dos formas de ejecutar este proyecto, dependiendo de tu preferencia. Amba
 > [!NOTE]
 > **Corrección de Etiquetas del Dataset (Bug Fix):**
 > En el código original de Kaggle, el orden de las clases parecía ser alfabético. Sin embargo, los archivos `.txt` internos del dataset tenían otro orden (`0`: Pituitary, `1`: Meningioma, `2`: Glioma, `3`: Notumor). Esto causaba que el modelo predijera clases incorrectas. **Este error ya está corregido en todos los scripts de este proyecto** ordenando el diccionario explícitamente.
+> 
+> **Filtrado Inteligente de Datos:** Adicionalmente, el script está programado para procesar el 100% de tus imágenes, pero descartará de manera automática aquellas fotos (`.jpg`) que no tengan su archivo de etiqueta correspondiente (`.txt`). Esto garantiza que la red neuronal aproveche toda la data posible, pero aprenda solo de datos limpios.
 
 ---
 
